@@ -24,7 +24,12 @@ body {
   padding-top: 50px;
 }
 
+.logo {
+  max-width:300px;
+}
+
 .site-title {
+  font-family: "Source Serif 4", serif;
   font-size: 22px;
   font-weight: 500;
   margin-bottom: 10px;
