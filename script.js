@@ -3,9 +3,6 @@ const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
 const chatWindow = document.getElementById("chatWindow");
 
-// Set initial message
-chatWindow.textContent = "👋 Hello! How can I help you today?";
-
 let messages = [
   { role: "system", content: `You are an AI chatbot designed exclusively to assist users with L'Oréal products. Your goal is to help users explore the full range of L'Oréal's offerings—including makeup, skincare, haircare, and fragrances—and to provide personalized routines, advice, and product recommendations. You must only provide information about, and recommend, products, routines, and solutions from the L'Oréal portfolio. Never suggest, discuss, or recommend products from any other brand. Only answer questions related to L'Oréal’s products, routines, or personalized recommendations, and politely decline to answer unrelated queries.
 
@@ -96,15 +93,32 @@ You may only discuss, recommend, or answer questions about L'Oréal’s products
 //Cloudflare link for API requests
 const workerUrl = 'https://wanderbot-worker.cademedearis.workers.dev/'
 
+//Initialize the chat window
+const initialMessage = { role: 'assistant', content: "Hello! How can I assist you with L'Oréal products today? Feel free to ask about makeup, skincare, haircare, or fragrances!" }
+appendMessage(initialMessage); // Display the initial message in the chat window
+let initialMessageDisplayed = true; // Flag to track if the initial message has been displayed
+
 /* Handle form submit */
 chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-
-  // Show message
-  chatWindow.innerHTML = "Thinking...";
-
+  
+  //Check if the initial message has been displayed
+  if (initialMessageDisplayed) {
+    chatWindow.innerHTML = ""; // Clear the chat window if the initial message has been displayed
+    initialMessageDisplayed = false; // Reset the flag
+  }
   //Add user's message to the conversation history
-  messages.push({ role: 'user', content: userInput.value });
+  const userMsg = { role: 'user', content: userInput.value };
+  messages.push(userMsg); // Add user message to the messages array
+
+  //Display chat in window
+  appendMessage(userMsg); // Display the user's message in the chat window
+  await delay(1000); // Wait for a short time to simulate thinking
+
+  //Display chat in window
+  messages.push({ role: 'assistant', content: "Thinking..." }); // Add a "Thinking..." message
+
+  appendMessage(messages[messages.length - 1]); // Display the "Thinking..." message
 
 
 try {
@@ -130,11 +144,15 @@ try {
   //Parse the response as JSON
   const result = await response.json();
 
+  messages.pop(); // Remove the "Thinking..." message
+  chatWindow.lastChild.remove(); // Remove the "Thinking..." message from the chat window
+
   //Add the AI's response to the conversaton history
   messages.push({ role: 'assistant', content: result.choices[0].message.content });
 
-  //Display AI response in chat window
-  chatWindow.textContent = result.choices[0].message.content;
+  
+  //Display chat in window
+  appendMessage(messages[messages.length - 1]); // Display the AI's response
 
   } catch (error) {
     console.error('Error:', error); // Log any errors to the console
@@ -143,3 +161,24 @@ try {
 
     userInput.value = ""; // Clear the input field
 });
+
+// Function to render messages in the chat window
+function appendMessage(msg) {
+  const msgDiv = document.createElement('div');
+  msgDiv.classList.add("message");
+
+  if (msg.role === "user") {
+    msgDiv.classList.add("user-message");
+  } else if (msg.role === "assistant") {
+    msgDiv.classList.add("assistant-message");
+  }
+
+  msgDiv.textContent = msg.content;
+  chatWindow.appendChild(msgDiv);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+
+function delay(ms) {  //To create a slight delay for the "Thinking..." message
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
