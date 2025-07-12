@@ -175,7 +175,7 @@ body {
 /* User message style (blue, right) */
 .user-message {
   align-self: flex-end;
-  background-color: #007bff;
+  background-color: #ff003b;
   color: white;
   border-bottom-right-radius: 0;
   text-align: right;
