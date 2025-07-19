@@ -110,10 +110,13 @@ chatForm.addEventListener("submit", async (event) => {
   //Add user's message to the conversation history
   const userMsg = { role: 'user', content: userInput.value };
   messages.push(userMsg); // Add user message to the messages array
+  userInput.value = ""; // Clear the input field
 
   //Display chat in window
   appendMessage(userMsg); // Display the user's message in the chat window
   await delay(1000); // Wait for a short time to simulate thinking
+
+
 
   //Display chat in window
   messages.push({ role: 'assistant', content: "Thinking..." }); // Add a "Thinking..." message
@@ -158,8 +161,6 @@ try {
     console.error('Error:', error); // Log any errors to the console
     chatWindow.textContent = "Sorry, something went wrong. Please try again later.";
   }
-
-    userInput.value = ""; // Clear the input field
 });
 
 // Function to render messages in the chat window
